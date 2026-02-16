@@ -1,0 +1,14 @@
+streamlit
+pandas
+numpy
+plotly
+scikit-learn
+xgboost
+requests
+python-dotenv
+PyPDF2
+pymongo
+bcrypt
+reportlab
+statsmodels
+scipy
