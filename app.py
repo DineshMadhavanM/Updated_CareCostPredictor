@@ -951,6 +951,72 @@ st.set_page_config(
     layout="wide"
 )
 
+# --- Mobile UI Optimization ---
+st.markdown("""
+<style>
+    /* Global Font Size Increase for Readability */
+    html, body, [class*="css"]  {
+        font-size: 16px; 
+    }
+    
+    /* Make buttons full width on mobile devices */
+    @media only screen and (max-width: 600px) {
+        div[data-testid="stButton"] button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+        }
+    }
+    
+    /* Increase padding for input fields */
+    .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
+        padding: 10px 12px;
+        min-height: 44px; /* Minimum height for touch targets */
+    }
+    
+    /* Adjust Streamlit Main Container padding */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    /* Enhance Titles and Headings */
+    h1 {
+        font-size: 2.5rem !important;
+        font-weight: 700 !important;
+    }
+    
+    h2 {
+        font-size: 1.8rem !important;
+        margin-top: 1.5rem !important;
+    }
+    
+    h3 {
+        font-size: 1.4rem !important;
+    }
+    
+    /* Improve Metrics Visuals */
+    div[data-testid="stMetricValue"] {
+        font-size: 1.8rem !important;
+    }
+    
+    /* Make Tabs easier to tap */
+    .stTabs [data-baseweb="tab"] {
+        padding: 10px 15px;
+        font-size: 1.1rem;
+        min-height: 44px;
+    }
+    
+    /* Sidebar adjustments for mobile */
+    [data-testid="stSidebar"] {
+        background-color: #f8f9fa;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Initialize session state
 if 'language' not in st.session_state:
     st.session_state.language = 'en'
