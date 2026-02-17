@@ -48,3 +48,6 @@ Thumbs.db
 # Agent/Brain Artifacts
 brain/
 .gemini/
+
+# Generated Assets
+attached_assets/
