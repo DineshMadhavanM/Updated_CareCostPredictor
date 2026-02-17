@@ -51,3 +51,7 @@ brain/
 
 # Generated Assets
 attached_assets/
+# Miscellaneous
+.vscode/
+.idea/
+*.swp
