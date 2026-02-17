@@ -34,65 +34,115 @@ st.set_page_config(
 # --- Mobile UI Optimization ---
 st.markdown("""
 <style>
-    /* Global Font Size Increase for Readability */
-    html, body, [class*="css"]  {
-        font-size: 16px; 
+    /* Premium Modern Dashboard Styles */
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Outfit', sans-serif !important;
+        font-size: 16px;
     }
-    
-    /* Make buttons full width on mobile devices */
-    @media only screen and (max-width: 600px) {
-        div[data-testid="stButton"] button {
-            width: 100%;
-            margin-top: 10px;
-            padding: 12px 20px;
-            font-size: 1.1rem;
-        }
+
+    /* Main Container Styling */
+    .stApp {
+        background-color: #0f172a;
+        color: #f1f5f9;
     }
-    
-    /* Increase padding for input fields */
-    .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
-        padding: 10px 12px;
-        min-height: 44px; /* Minimum height for touch targets */
+
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background-color: #1e293b !important;
+        border-right: 1px solid #334155;
     }
-    
-    /* Adjust Streamlit Main Container padding */
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 5rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
+
+    /* Card-like containers for metrics and inputs */
+    div.stMetric, div[data-testid="stMetricValue"] {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 15px !important;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
-    
-    /* Enhance Titles and Headings */
-    h1 {
-        font-size: 2.5rem !important;
+
+    div[data-testid="stMetricValue"] {
+        color: #2dd4bf !important;
         font-weight: 700 !important;
     }
-    
-    h2 {
-        font-size: 1.8rem !important;
-        margin-top: 1.5rem !important;
+
+    /* Customizing Buttons */
+    div.stButton > button {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        width: 100%;
     }
-    
-    h3 {
-        font-size: 1.4rem !important;
+
+    div.stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+        border: none;
+        color: white;
     }
-    
-    /* Improve Metrics Visuals */
-    div[data-testid="stMetricValue"] {
-        font-size: 1.8rem !important;
+
+    /* Input focus effects */
+    .stTextInput input:focus, .stNumberInput input:focus, .stSelectbox div[data-baseweb="select"]:focus {
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 1px #6366f1 !important;
     }
-    
-    /* Make Tabs easier to tap */
+
+    /* Tabs Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: #1e293b;
+        padding: 8px;
+        border-radius: 12px;
+        border: 1px solid #334155;
+    }
+
     .stTabs [data-baseweb="tab"] {
-        padding: 10px 15px;
-        font-size: 1.1rem;
-        min-height: 44px;
+        height: 44px;
+        border-radius: 8px;
+        background-color: transparent;
+        border: none;
+        color: #94a3b8;
+        font-weight: 500;
     }
-    
-    /* Sidebar adjustments for mobile */
-    [data-testid="stSidebar"] {
-        background-color: #f8f9fa;
+
+    .stTabs [aria-selected="true"] {
+        background-color: #334155 !important;
+        color: #f1f5f9 !important;
+    }
+
+    /* Headings Styling */
+    h1 {
+        background: linear-gradient(135deg, #2dd4bf 0%, #6366f1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800 !important;
+        letter-spacing: -0.02em;
+    }
+
+    h2, h3 {
+        color: #f1f5f9 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Dividers */
+    hr {
+        border-color: #334155 !important;
+    }
+
+    /* Success/Info boxes */
+    div[data-testid="stNotification"] {
+        background-color: #1e293b !important;
+        border: 1px solid #334155 !important;
+        border-radius: 12px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -386,7 +436,13 @@ with tab1:
         fig_impact = px.bar(impact_df, x='Factor', y='Impact (₹)', 
                            title=t('factor_impact_title'),
                            color='Impact (₹)',
-                           color_continuous_scale='RdYlGn_r')
+                           color_continuous_scale='Viridis',
+                           template='plotly_dark')
+        fig_impact.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font_family='Outfit'
+        )
         st.plotly_chart(fig_impact, use_container_width=True)
         
         # PDF Export
@@ -424,17 +480,30 @@ with tab2:
         fig_age = px.scatter(df, x='age', y='charges', color='smoker',
                             title=t('cost_vs_age'),
                             labels={'charges': t('insurance_cost'), 'age': t('age_years')},
-                            color_discrete_map={'yes': '#ff4444', 'no': '#44ff44'},
-                            trendline='lowess')
-        fig_age.update_layout(height=400)
+                            color_discrete_map={'yes': '#f43f5e', 'no': '#10b981'},
+                            trendline='lowess',
+                            template='plotly_dark')
+        fig_age.update_layout(
+            height=400,
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font_family='Outfit'
+        )
         st.plotly_chart(fig_age, use_container_width=True)
         
         # Cost vs Children
         avg_by_children = df.groupby('children')['charges'].mean().reset_index()
         fig_children = px.bar(avg_by_children, x='children', y='charges',
                              title=t('avg_cost_children'),
-                             labels={'charges': t('average_cost'), 'children': t('number_of_children')})
-        fig_children.update_layout(height=400)
+                             labels={'charges': t('average_cost'), 'children': t('number_of_children')},
+                             template='plotly_dark',
+                             color_discrete_sequence=['#6366f1'])
+        fig_children.update_layout(
+            height=400,
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font_family='Outfit'
+        )
         st.plotly_chart(fig_children, use_container_width=True)
     
     with viz_col2:
@@ -442,9 +511,15 @@ with tab2:
         fig_bmi = px.scatter(df, x='bmi', y='charges', color='smoker',
                             title=t('cost_vs_bmi'),
                             labels={'charges': t('insurance_cost'), 'bmi': 'BMI'},
-                            color_discrete_map={'yes': '#ff4444', 'no': '#44ff44'},
-                            trendline='lowess')
-        fig_bmi.update_layout(height=400)
+                            color_discrete_map={'yes': '#f43f5e', 'no': '#10b981'},
+                            trendline='lowess',
+                            template='plotly_dark')
+        fig_bmi.update_layout(
+            height=400,
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font_family='Outfit'
+        )
         st.plotly_chart(fig_bmi, use_container_width=True)
         
         # Smoking Impact
@@ -453,20 +528,33 @@ with tab2:
                            title=t('smoking_impact'),
                            labels={'charges': t('average_cost'), 'smoker': t('smoker')},
                            color='smoker',
-                           color_discrete_map={'yes': '#ff4444', 'no': '#44ff44'})
-        fig_smoker.update_layout(height=400)
+                           color_discrete_map={'yes': '#f43f5e', 'no': '#10b981'},
+                           template='plotly_dark')
+        fig_smoker.update_layout(
+            height=400,
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font_family='Outfit'
+        )
         st.plotly_chart(fig_smoker, use_container_width=True)
     
     # Regional analysis
     st.markdown("---")
     regional_stats = df.groupby('region')['charges'].agg(['mean', 'min', 'max']).reset_index()
     regional_stats.columns = [t('region'), t('average') + ' Cost', t('minimum') + ' Cost', t('maximum') + ' Cost']
-    
     fig_region = go.Figure()
-    fig_region.add_trace(go.Bar(name=t('average'), x=regional_stats[t('region')], y=regional_stats[t('average') + ' Cost']))
-    fig_region.add_trace(go.Bar(name=t('minimum'), x=regional_stats[t('region')], y=regional_stats[t('minimum') + ' Cost']))
-    fig_region.add_trace(go.Bar(name=t('maximum'), x=regional_stats[t('region')], y=regional_stats[t('maximum') + ' Cost']))
-    fig_region.update_layout(title=t('regional_cost_analysis'), barmode='group', height=400)
+    fig_region.add_trace(go.Bar(name=t('average'), x=regional_stats[t('region')], y=regional_stats[t('average') + ' Cost'], marker_color='#6366f1'))
+    fig_region.add_trace(go.Bar(name=t('minimum'), x=regional_stats[t('region')], y=regional_stats[t('minimum') + ' Cost'], marker_color='#10b981'))
+    fig_region.add_trace(go.Bar(name=t('maximum'), x=regional_stats[t('region')], y=regional_stats[t('maximum') + ' Cost'], marker_color='#f43f5e'))
+    fig_region.update_layout(
+        title=t('regional_cost_analysis'), 
+        barmode='group', 
+        height=400,
+        template='plotly_dark',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font_family='Outfit'
+    )
     st.plotly_chart(fig_region, use_container_width=True)
 
 # Tab 3: What-If Analysis
@@ -533,8 +621,14 @@ with tab3:
     fig_comparison = px.bar(comparison_data, x='Scenario', y='Cost',
                            title=t('comparison_title'),
                            color='Scenario',
-                           color_discrete_map={t('baseline'): '#3498db', t('whatif'): '#e74c3c'})
-    fig_comparison.update_layout(height=400)
+                           color_discrete_map={t('baseline'): '#6366f1', t('whatif'): '#f43f5e'},
+                           template='plotly_dark')
+    fig_comparison.update_layout(
+        height=400,
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font_family='Outfit'
+    )
     st.plotly_chart(fig_comparison, use_container_width=True)
     
     # Parameter change summary
@@ -1075,8 +1169,14 @@ with tab6:
         st.subheader(t('trend_over_time'))
         fig_trend = px.line(history_df, x='timestamp', y='predicted_cost',
                            title=t('trend_over_time'),
-                           labels={'predicted_cost': t('insurance_cost'), 'timestamp': 'Time'})
-        fig_trend.update_traces(mode='lines+markers')
+                           labels={'predicted_cost': t('insurance_cost'), 'timestamp': 'Time'},
+                           template='plotly_dark')
+        fig_trend.update_traces(mode='lines+markers', line_color='#6366f1', marker=dict(size=8, color='#2dd4bf'))
+        fig_trend.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font_family='Outfit'
+        )
         st.plotly_chart(fig_trend, use_container_width=True)
         
         # Additional analytics
@@ -1087,14 +1187,28 @@ with tab6:
             history_df['age_group'] = pd.cut(history_df['age'], bins=[0, 30, 40, 50, 65], labels=['18-30', '31-40', '41-50', '51-64'])
             age_group_avg = history_df.groupby('age_group')['predicted_cost'].mean().reset_index()
             fig_age = px.bar(age_group_avg, x='age_group', y='predicted_cost',
-                           labels={'predicted_cost': t('average_cost'), 'age_group': t('age')})
+                           labels={'predicted_cost': t('average_cost'), 'age_group': t('age')},
+                           template='plotly_dark',
+                           color_discrete_sequence=['#2dd4bf'])
+            fig_age.update_layout(
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font_family='Outfit'
+            )
             st.plotly_chart(fig_age, use_container_width=True)
         
         with col2:
             st.subheader(t('cost_by_smoker'))
             smoker_dist = history_df.groupby('smoker')['predicted_cost'].mean().reset_index()
             fig_smoker = px.pie(smoker_dist, values='predicted_cost', names='smoker',
-                              title=t('cost_by_smoker'))
+                               title=t('cost_by_smoker'),
+                               template='plotly_dark',
+                               color_discrete_sequence=['#6366f1', '#f43f5e'])
+            fig_smoker.update_layout(
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font_family='Outfit'
+            )
             st.plotly_chart(fig_smoker, use_container_width=True)
         
         # Highest and lowest predictions
