@@ -184,20 +184,20 @@ def load_model():
         return pickle.load(f)
 
 @st.cache_data
-def predict_cost(model_data, age, sex, bmi, children, smoker, region):
+def predict_cost(_model_data, age, sex, bmi, children, smoker, region):
     """
     Predict insurance cost for given parameters
     """
     # Encode inputs
-    sex_encoded = model_data['le_sex'].transform([sex])[0]
-    smoker_encoded = model_data['le_smoker'].transform([smoker])[0]
-    region_encoded = model_data['le_region'].transform([region])[0]
+    sex_encoded = _model_data['le_sex'].transform([sex])[0]
+    smoker_encoded = _model_data['le_smoker'].transform([smoker])[0]
+    region_encoded = _model_data['le_region'].transform([region])[0]
     
     # Create feature array
     features = np.array([[age, sex_encoded, bmi, children, smoker_encoded, region_encoded]])
     
     # Predict
-    prediction = model_data['model'].predict(features)[0]
+    prediction = _model_data['model'].predict(features)[0]
     
     return round(prediction, 2)
 
