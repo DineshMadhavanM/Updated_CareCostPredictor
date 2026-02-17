@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 try:
     from sklearn.ensemble import RandomForestRegressor
     from sklearn.model_selection import train_test_split
@@ -182,6 +183,7 @@ def load_model():
     with open('insurance_model.pkl', 'rb') as f:
         return pickle.load(f)
 
+@st.cache_data
 def predict_cost(model_data, age, sex, bmi, children, smoker, region):
     """
     Predict insurance cost for given parameters
@@ -199,6 +201,7 @@ def predict_cost(model_data, age, sex, bmi, children, smoker, region):
     
     return round(prediction, 2)
 
+@st.cache_data
 def get_risk_level(cost):
     """
     Categorize risk level based on predicted cost
@@ -210,6 +213,7 @@ def get_risk_level(cost):
     else:
         return "High", "🔴"
 
+@st.cache_data
 def get_govt_vs_private_comparison(predicted_cost):
     """
     Compare with government and private insurance ranges
@@ -420,6 +424,7 @@ def generate_pdf_report(user_data, predicted_cost, risk_level, comparison_data, 
     buffer.seek(0)
     return buffer
 
+@st.cache_data
 def estimate_accident_injury_cost(accident_type, severity, hospitalization, surgery, recovery_days):
     """
     Estimate additional insurance cost for accident/injury
@@ -467,6 +472,7 @@ def estimate_accident_injury_cost(accident_type, severity, hospitalization, surg
     
     return round(base_cost, 2)
 
+@st.cache_data
 def get_accident_cost_breakdown(accident_type, severity, hospitalization, surgery, recovery_days):
     """
     Get detailed breakdown of accident/injury costs
@@ -505,6 +511,7 @@ def get_accident_cost_breakdown(accident_type, severity, hospitalization, surger
     
     return breakdown
 
+@st.cache_data
 def get_government_scheme_recommendations(age, children, smoker, predicted_cost, bmi, region):
     """
     Recommend government healthcare schemes based on user profile and predicted cost
