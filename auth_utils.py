@@ -11,6 +11,7 @@ except ImportError:
         def close(self): pass
         def admin(self): return self
         def command(self, *args): pass
+import streamlit as st
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -20,6 +21,7 @@ MONGODB_URI = os.getenv("MONGODB_URI")
 DB_NAME = "carecost_predictor"
 COLLECTION_NAME = "users"
 
+@st.cache_resource
 def get_db_client():
     """Initialize and return MongoDB client."""
     try:
@@ -28,7 +30,7 @@ def get_db_client():
         client.admin.command('ping')
         return client
     except Exception as e:
-        print(f"MongoDB Connection Error: {e}")
+        st.error(f"MongoDB Connection Error: {e}")
         return None
 
 def hash_password(password):
@@ -51,7 +53,6 @@ def sign_up_user(username, password, email):
     
     # Check if user already exists
     if users_col.find_one({"username": username}):
-        client.close()
         return False, "Username already exists"
     
     # Hash and save user
@@ -62,7 +63,6 @@ def sign_up_user(username, password, email):
         "password": hashed_pw
     })
     
-    client.close()
     return True, "User registered successfully"
 
 def login_user(username, password):
@@ -75,7 +75,6 @@ def login_user(username, password):
     users_col = db[COLLECTION_NAME]
     
     user = users_col.find_one({"username": username})
-    client.close()
     
     if user and check_password(password, user['password']):
         return True, "Login successful", user.get('email')
@@ -93,5 +92,4 @@ def get_all_users():
     
     # Return username and email only, exclude password
     users = list(users_col.find({}, {"username": 1, "email": 1, "_id": 0}))
-    client.close()
     return users

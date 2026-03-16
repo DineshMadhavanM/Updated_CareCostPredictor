@@ -245,6 +245,70 @@ def initialize_app():
 
 model_data, df = initialize_app()
 
+# --- Cached Visualizations ---
+@st.cache_data
+def get_age_cost_plot(df, title, x_label, y_label):
+    fig = px.scatter(df, x='age', y='charges', color='smoker',
+                     title=title,
+                     labels={'charges': y_label, 'age': x_label},
+                     color_discrete_map={'yes': '#f43f5e', 'no': '#10b981'},
+                     trendline='lowess',
+                     template='plotly_dark')
+    fig.update_layout(height=400, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_family='Outfit')
+    return fig
+
+@st.cache_data
+def get_children_cost_plot(df, title, x_label, y_label):
+    avg_by_children = df.groupby('children')['charges'].mean().reset_index()
+    fig = px.bar(avg_by_children, x='children', y='charges',
+                 title=title,
+                 labels={'charges': y_label, 'children': x_label},
+                 template='plotly_dark',
+                 color_discrete_sequence=['#6366f1'])
+    fig.update_layout(height=400, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_family='Outfit')
+    return fig
+
+@st.cache_data
+def get_bmi_cost_plot(df, title, y_label):
+    fig = px.scatter(df, x='bmi', y='charges', color='smoker',
+                     title=title,
+                     labels={'charges': y_label, 'bmi': 'BMI'},
+                     color_discrete_map={'yes': '#f43f5e', 'no': '#10b981'},
+                     trendline='lowess',
+                     template='plotly_dark')
+    fig.update_layout(height=400, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_family='Outfit')
+    return fig
+
+@st.cache_data
+def get_smoker_impact_plot(df, title, x_label, y_label):
+    avg_by_smoker = df.groupby('smoker')['charges'].mean().reset_index()
+    fig = px.bar(avg_by_smoker, x='smoker', y='charges',
+                 title=title,
+                 labels={'charges': y_label, 'smoker': x_label},
+                 color='smoker',
+                 color_discrete_map={'yes': '#f43f5e', 'no': '#10b981'},
+                 template='plotly_dark')
+    fig.update_layout(height=400, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_family='Outfit')
+    return fig
+
+@st.cache_data
+def get_regional_cost_plot(df, title, labels):
+    regional_stats = df.groupby('region')['charges'].agg(['mean', 'min', 'max']).reset_index()
+    fig = go.Figure()
+    fig.add_trace(go.Bar(name=labels['avg'], x=regional_stats['region'], y=regional_stats['mean'], marker_color='#6366f1'))
+    fig.add_trace(go.Bar(name=labels['min'], x=regional_stats['region'], y=regional_stats['min'], marker_color='#10b981'))
+    fig.add_trace(go.Bar(name=labels['max'], x=regional_stats['region'], y=regional_stats['max'], marker_color='#f43f5e'))
+    fig.update_layout(
+        title=title, 
+        barmode='group', 
+        height=400,
+        template='plotly_dark',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font_family='Outfit'
+    )
+    return fig
+
 # Title and description
 st.title(t('main_title'))
 st.markdown(t('main_description'))
@@ -477,84 +541,26 @@ with tab2:
     
     with viz_col1:
         # Cost vs Age
-        fig_age = px.scatter(df, x='age', y='charges', color='smoker',
-                            title=t('cost_vs_age'),
-                            labels={'charges': t('insurance_cost'), 'age': t('age_years')},
-                            color_discrete_map={'yes': '#f43f5e', 'no': '#10b981'},
-                            trendline='lowess',
-                            template='plotly_dark')
-        fig_age.update_layout(
-            height=400,
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            font_family='Outfit'
-        )
+        fig_age = get_age_cost_plot(df, t('cost_vs_age'), t('age_years'), t('insurance_cost'))
         st.plotly_chart(fig_age, use_container_width=True)
         
         # Cost vs Children
-        avg_by_children = df.groupby('children')['charges'].mean().reset_index()
-        fig_children = px.bar(avg_by_children, x='children', y='charges',
-                             title=t('avg_cost_children'),
-                             labels={'charges': t('average_cost'), 'children': t('number_of_children')},
-                             template='plotly_dark',
-                             color_discrete_sequence=['#6366f1'])
-        fig_children.update_layout(
-            height=400,
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            font_family='Outfit'
-        )
+        fig_children = get_children_cost_plot(df, t('avg_cost_children'), t('number_of_children'), t('average_cost'))
         st.plotly_chart(fig_children, use_container_width=True)
     
     with viz_col2:
         # Cost vs BMI
-        fig_bmi = px.scatter(df, x='bmi', y='charges', color='smoker',
-                            title=t('cost_vs_bmi'),
-                            labels={'charges': t('insurance_cost'), 'bmi': 'BMI'},
-                            color_discrete_map={'yes': '#f43f5e', 'no': '#10b981'},
-                            trendline='lowess',
-                            template='plotly_dark')
-        fig_bmi.update_layout(
-            height=400,
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            font_family='Outfit'
-        )
+        fig_bmi = get_bmi_cost_plot(df, t('cost_vs_bmi'), t('insurance_cost'))
         st.plotly_chart(fig_bmi, use_container_width=True)
         
         # Smoking Impact
-        avg_by_smoker = df.groupby('smoker')['charges'].mean().reset_index()
-        fig_smoker = px.bar(avg_by_smoker, x='smoker', y='charges',
-                           title=t('smoking_impact'),
-                           labels={'charges': t('average_cost'), 'smoker': t('smoker')},
-                           color='smoker',
-                           color_discrete_map={'yes': '#f43f5e', 'no': '#10b981'},
-                           template='plotly_dark')
-        fig_smoker.update_layout(
-            height=400,
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            font_family='Outfit'
-        )
+        fig_smoker = get_smoker_impact_plot(df, t('smoking_impact'), t('smoker'), t('average_cost'))
         st.plotly_chart(fig_smoker, use_container_width=True)
     
     # Regional analysis
     st.markdown("---")
-    regional_stats = df.groupby('region')['charges'].agg(['mean', 'min', 'max']).reset_index()
-    regional_stats.columns = [t('region'), t('average') + ' Cost', t('minimum') + ' Cost', t('maximum') + ' Cost']
-    fig_region = go.Figure()
-    fig_region.add_trace(go.Bar(name=t('average'), x=regional_stats[t('region')], y=regional_stats[t('average') + ' Cost'], marker_color='#6366f1'))
-    fig_region.add_trace(go.Bar(name=t('minimum'), x=regional_stats[t('region')], y=regional_stats[t('minimum') + ' Cost'], marker_color='#10b981'))
-    fig_region.add_trace(go.Bar(name=t('maximum'), x=regional_stats[t('region')], y=regional_stats[t('maximum') + ' Cost'], marker_color='#f43f5e'))
-    fig_region.update_layout(
-        title=t('regional_cost_analysis'), 
-        barmode='group', 
-        height=400,
-        template='plotly_dark',
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font_family='Outfit'
-    )
+    regional_labels = {'avg': t('average'), 'min': t('minimum'), 'max': t('maximum')}
+    fig_region = get_regional_cost_plot(df, t('regional_cost_analysis'), regional_labels)
     st.plotly_chart(fig_region, use_container_width=True)
 
 # Tab 3: What-If Analysis
